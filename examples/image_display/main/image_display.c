@@ -9,7 +9,7 @@
 #include "bsp/esp-bsp.h"
 #include "esp_log.h"
 
-#include "ASG_4color.h"
+
 
 static const char *TAG = "main";
 
@@ -95,9 +95,9 @@ static void image_display(void)
     lv_obj_set_style_border_width(list, 0, LV_STATE_DEFAULT);
     lv_obj_align(list, LV_ALIGN_TOP_LEFT, 0, 0);
 
-    // Create ASG logo image at bottom left, 25% zoom from C array
+    // Create ASG logo image at bottom left, 25% zoom from PNG file
     lv_obj_t *asg_img = lv_img_create(lv_scr_act());
-    lv_img_set_src(asg_img, &asg_4color_img);
+    lv_img_set_src(asg_img, "S:/spiffs/ASG_logo.png");
     lv_img_set_zoom(asg_img, 64); // 25% zoom
     lv_obj_align(asg_img, LV_ALIGN_BOTTOM_LEFT, 0, 0);
 
