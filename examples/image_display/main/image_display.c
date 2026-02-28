@@ -9,6 +9,8 @@
 #include "bsp/esp-bsp.h"
 #include "esp_log.h"
 
+#include "ASG_4color.h"
+
 static const char *TAG = "main";
 
 static lv_group_t *g_btn_op_group = NULL;
@@ -54,6 +56,13 @@ static void btn_event_cb(lv_event_t *event)
         /* Set src of image with file name */
         lv_img_set_src(img, file_name_with_path);
 
+        /* Scale to 25% if filename starts with ASG */
+        if (strncmp(file_name, "ASG", 3) == 0) {
+            lv_img_set_zoom(img, 64); // 64 = 25% (LVGL zoom uses 256 as 100%)
+        } else {
+            lv_img_set_zoom(img, 256); // 256 = 100%
+        }
+
         /* Align object */
         lv_obj_align(img, LV_ALIGN_CENTER, 80, 0);
 
@@ -76,12 +85,21 @@ static void image_display(void)
         lv_indev_set_group(indev, g_btn_op_group);
     }
 
-    lv_obj_t *list = lv_list_create(lv_scr_act());
-    lv_obj_set_size(list, 170, 220);
-    lv_obj_set_style_border_width(list, 0, LV_STATE_DEFAULT);
-    lv_obj_align(list, LV_ALIGN_LEFT_MID, -15, 0);
+    // Get display resolution
+    uint16_t disp_w = BSP_LCD_H_RES;
+    uint16_t disp_h = BSP_LCD_V_RES;
 
-    lv_obj_t *img = lv_img_create(lv_scr_act());
+    // Create file list box in top half of the screen
+    lv_obj_t *list = lv_list_create(lv_scr_act());
+    lv_obj_set_size(list, disp_w, disp_h / 2); // Full width, half height
+    lv_obj_set_style_border_width(list, 0, LV_STATE_DEFAULT);
+    lv_obj_align(list, LV_ALIGN_TOP_LEFT, 0, 0);
+
+    // Create ASG logo image at bottom left, 25% zoom from C array
+    lv_obj_t *asg_img = lv_img_create(lv_scr_act());
+    lv_img_set_src(asg_img, &asg_4color_img);
+    lv_img_set_zoom(asg_img, 64); // 25% zoom
+    lv_obj_align(asg_img, LV_ALIGN_BOTTOM_LEFT, 0, 0);
 
     /* Get file name in storage */
     struct dirent *p_dirent = NULL;
@@ -93,7 +111,8 @@ static void image_display(void)
         if (NULL != p_dirent) {
             lv_obj_t *btn = lv_list_add_btn(list, LV_SYMBOL_IMAGE, p_dirent->d_name);
             lv_group_add_obj(g_btn_op_group, btn);
-            lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_CLICKED, (void *) img);
+            // Use the previous img logic only for file list images (not ASG logo)
+            lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_CLICKED, (void *) asg_img);
         } else {
             closedir(p_dir_stream);
             break;

@@ -1,6 +1,7 @@
 idf_component_register(
     SRCS
         "image_display.c"
+        "ASG_4color.c"
     INCLUDE_DIRS
         "")
 
