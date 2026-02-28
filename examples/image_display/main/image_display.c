@@ -104,6 +104,8 @@ static void image_display(void)
     lv_obj_align(jpg_img, LV_ALIGN_BOTTOM_LEFT, 0, 0);
     lv_obj_move_foreground(jpg_img);
 
+    lv_obj_t *img = lv_img_create(lv_scr_act());
+
     // // Create ASG logo image at bottom left, 25% zoom from PNG file
     // lv_obj_t *asg_img = lv_img_create(lv_scr_act());
 
@@ -129,7 +131,7 @@ static void image_display(void)
             lv_obj_t *btn = lv_list_add_btn(list, LV_SYMBOL_IMAGE, p_dirent->d_name);
             lv_group_add_obj(g_btn_op_group, btn);
             // Use the previous img logic only for file list images (not ASG logo)
-            lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_CLICKED, (void *)asg_img);
+            lv_obj_add_event_cb(btn, btn_event_cb, LV_EVENT_CLICKED, (void *)img);
         }
         else
         {
